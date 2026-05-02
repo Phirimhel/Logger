@@ -1,0 +1,7 @@
+2026-05-02T19-03-4.85	DEBUG	Logger/main.go:15	Debug log test
+2026-05-02T19-03-4.85	INFO	Logger/main.go:16	Info log test
+2026-05-02T19-03-4.85	ERROR	Logger/main.go:17	Erorr log test
+main.main
+	/Users/philirium/Desktop/GO/Logger/main.go:17
+runtime.main
+	/usr/local/go/src/runtime/proc.go:285
