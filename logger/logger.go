@@ -12,33 +12,37 @@ import (
 
 func NewLogger(logLevel string) (*zap.Logger, func() error, error) {
 
-	lvl := zap.NewAtomicLevel()
-	if err := lvl.UnmarshalText([]byte(logLevel)); err != nil {
-		return nil, nil, fmt.Errorf("unmarshal log level: %w", err)
-	}
-
+	// create log's dir
 	if err := os.MkdirAll("logs", 0755); err != nil {
 		return nil, nil, fmt.Errorf("mkdir log folder: %w", err)
 	}
 
+	// create log's file
 	timestamp := time.Now().UTC().Format("2006-01-02T15-04-5.00")
 	logFilePath := filepath.Join("logs", fmt.Sprintf("%s.log", timestamp))
-
 	logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return nil, nil, fmt.Errorf("open log file: %w", err)
 	}
 
+	// confing log's file
 	cfg := zap.NewDevelopmentEncoderConfig()
 	cfg.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02T15-04-5.00")
-
 	encoder := zapcore.NewConsoleEncoder(cfg)
 
+	// check log's lvl
+	lvl := zap.NewAtomicLevel()
+	if err := lvl.UnmarshalText([]byte(logLevel)); err != nil {
+		return nil, nil, fmt.Errorf("unmarshal log level: %w", err)
+	}
+
+	// create log's core for cmd and file
 	core := zapcore.NewTee(
 		zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), lvl),
 		zapcore.NewCore(encoder, zapcore.AddSync(logFile), lvl),
 	)
 
+	// create logger
 	logger := zap.New(
 		core,
 		zap.AddCaller(),
